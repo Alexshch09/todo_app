@@ -1,30 +1,52 @@
 # main.py
+
+# Libraries
 from flask import Flask, request
-from config import Config
+from flask_jwt_extended import JWTManager
 from redis import Redis
-from routes.tests import tests
+
+# Packages
+from config import Config
 from db_manager import init_db
 from logger_setup import logger
 
+# Blueprints Import
+from routes.tests import tests
+from routes.auth import auth
+
+jwt = JWTManager()
+
+
 def create_app(config_class=Config):
-    app = Flask(__name__)
-    app.config.from_object(config_class)
+    """
+    Creates app instance
+    
+    and returns app object
+    """
+
+    app = Flask(__name__) # Create app
+    app.config.from_object(config_class) # Load config
     app.redis_client = Redis.from_url(app.config['REDIS_URL'])
     
-    init_db(app)
+    init_db(app) # Initiate database manager
+    jwt.init_app(app) # Initiate jwt handler
 
-    app.register_blueprint(tests)
+    # Register all blueprints
+    app.register_blueprint(tests) # Blueprint for beta functions
+    app.register_blueprint(auth) # Authentication
     
     logger.info("Flask app initialized with config: %s", config_class)
 
     return app
 
-app = create_app()
+app = create_app() # Create app
 
+# Log requests
 @app.before_request
 def log_request_info():
     logger.info('Request: %s %s', request.method, request.url)
 
+# Log errors
 @app.errorhandler(Exception)
 def handle_exception(e):
     logger.error("An error occurred: %s", str(e))
@@ -32,4 +54,4 @@ def handle_exception(e):
 
 if __name__ == '__main__':
     logger.info("Starting Flask app on http://0.0.0.0:5000")
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True) # Debug version. Don't use on production

@@ -1,6 +1,14 @@
 from flask import current_app
 
 class UserManager:
+    """
+    User class
+    ---
+
+    Contains all users info
+    Structure:
+     - In dev
+    """
     def __init__(self, app):
         """Initialize UserManager with app context for database and Redis clients."""
         self.db_manager = app.db_manager

@@ -5,7 +5,7 @@ from logging import StreamHandler, FileHandler
 import pytz
 from datetime import datetime
 
-# Ensure the logs directory exists
+
 log_directory = './logs'
 os.makedirs(log_directory, exist_ok=True)
 
@@ -13,7 +13,7 @@ class CustomFormatter(logging.Formatter):
     """Custom logging formatter to set timezone in logs."""
     def formatTime(self, record, datefmt=None):
         # Set the desired timezone
-        timezone = pytz.timezone("Europe/Warsaw")  # Replace with your timezone
+        timezone = pytz.timezone("Europe/Warsaw")
         dt = datetime.fromtimestamp(record.created, tz=timezone)
         return dt.strftime(datefmt or "%Y-%m-%d %H:%M:%S")
 
@@ -35,5 +35,5 @@ logger.setLevel(logging.INFO)
 logger.addHandler(file_handler)
 logger.addHandler(stream_handler)
 
-# To avoid duplicate logs, ensure the logger is not set up with multiple handlers
+
 logger.propagate = False

@@ -51,7 +51,7 @@ class DBManager:
                 cursor.execute(query, params)
                 self.conn.commit()
         except Exception as e:
-            self.conn.rollback()  # Rollback transaction on error
+            self.conn.rollback()
             raise e
 
 # Initialize DBManager in Flask app context
