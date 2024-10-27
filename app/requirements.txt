@@ -3,3 +3,4 @@ psycopg2-binary
 redis
 PyJWT 
 Flask-JWT-Extended
+pytz

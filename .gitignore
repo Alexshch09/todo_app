@@ -4,3 +4,5 @@ redis_data
 db_data
 
 **/__pycache__
+
+app/logs
