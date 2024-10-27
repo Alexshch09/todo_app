@@ -1,0 +1,9 @@
+.env
+
+redis_data
+db_data
+
+app/__pycache__
+app/blueprints/__pycache__
+app/blueprints/*/__pycache__
+app/blueprints/db/*/__pycache__
