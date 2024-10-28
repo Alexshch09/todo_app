@@ -4,3 +4,4 @@ redis
 PyJWT 
 Flask-JWT-Extended
 pytz
+sentry-sdk[flask]

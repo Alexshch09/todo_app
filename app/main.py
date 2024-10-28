@@ -4,6 +4,7 @@
 from flask import Flask, request
 from flask_jwt_extended import JWTManager
 from redis import Redis
+import sentry_sdk
 
 # Packages
 from config import Config
@@ -27,6 +28,15 @@ def create_app(config_class=Config):
 
     app = Flask(__name__) # Create app
     app.config.from_object(config_class) # Load config
+
+    sentry_sdk.init(
+    dsn=app.config['SENTRY_DSN'],
+    traces_sample_rate=1.0,
+    _experiments={
+        "continuous_profiling_auto_start": True,
+    },
+)
+    
     app.redis_client = Redis.from_url(app.config['REDIS_URL'])
     
     init_db(app) # Initiate database manager

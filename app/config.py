@@ -10,3 +10,4 @@ class Config:
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=2)
     DATABASE_URL=os.environ.get('DATABASE_URL')
     REDIS_URL=os.environ.get('REDIS_URL')
+    SENTRY_DSN=os.environ.get('SENTRY_DSN')
