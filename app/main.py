@@ -5,6 +5,7 @@ from flask import Flask, request
 from flask_jwt_extended import JWTManager
 from redis import Redis
 import sentry_sdk
+import cloudinary
 
 # Packages
 from config import Config
@@ -36,9 +37,15 @@ def create_app(config_class=Config):
     traces_sample_rate=1.0,
     _experiments={
         "continuous_profiling_auto_start": True,
-    },
-)
+        },
+    )
     
+    cloudinary.config(
+        cloud_name=app.config['CLOUDINARY_CLOUD_NAME'],
+        api_key=app.config['CLOUDINARY_API_KEY'],
+        api_secret=app.config['CLOUDINARY_API_SECRET']
+    )
+
     app.redis_client = Redis.from_url(app.config['REDIS_URL'])
     
     init_db(app) # Initiate database manager
