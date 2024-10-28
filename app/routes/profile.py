@@ -83,7 +83,13 @@ def upload_profile_image():
 
     try:
         # Upload to Cloudinary
-        upload_result = cloudinary_upload(file, folder="profile_images/")
+        upload_result = cloudinary_upload(
+            file, 
+            folder="profile_images/",
+            transformation=[
+                {'width': 64, 'height': 64},
+            ])
+        
         image_url = upload_result.get("secure_url")
 
         # Update user in the database with the new image URL
