@@ -1,12 +1,12 @@
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from flask import current_app
-from logger_setup import logger  # Импортируем ваш logger
+from logger_setup import logger
 
 def with_transaction(func):
     """Decorator to ensure automatic rollback on transaction errors."""
     def wrapper(self, *args, **kwargs):
-        self.connect()  # Ensure connection is available
+        self.connect()
         try:
             result = func(self, *args, **kwargs)
             self.conn.commit()
