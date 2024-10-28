@@ -20,6 +20,15 @@ from routes.profile import profile
 
 jwt = JWTManager()
 
+def register_blueprints(app):
+    """
+    Registers Flask blueprints for route organization.
+    """
+    app.register_blueprint(tests)     # Blueprint for beta functions
+    app.register_blueprint(auth)       # Authentication
+    app.register_blueprint(profile) # Profile
+
+
 
 def create_app(config_class=Config):
     """
@@ -50,10 +59,8 @@ def create_app(config_class=Config):
     init_db(app) # Initiate database manager
     jwt.init_app(app) # Initiate jwt handler
 
-    # Register all blueprints
-    app.register_blueprint(tests) # Blueprint for beta functions
-    app.register_blueprint(auth) # Authentication
-    app.register_blueprint(profile) # Profile
+    # Register blueprints
+    register_blueprints(app)
 
     # Register error handlers
     register_error_handlers(app)
@@ -61,6 +68,7 @@ def create_app(config_class=Config):
     logger.info("Flask app initialized with config: %s", config_class)
 
     return app
+
 
 app = create_app() # Create app
 
