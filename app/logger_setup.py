@@ -17,9 +17,10 @@ class CustomFormatter(logging.Formatter):
         dt = datetime.fromtimestamp(record.created, tz=timezone)
         return dt.strftime(datefmt or "%Y-%m-%d %H:%M:%S")
 
-# Log file path
-log_file_path = os.path.join(log_directory, 'app.log')
-formatter = CustomFormatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+# Get the current date for log file naming
+current_date = datetime.now(pytz.timezone("Europe/Warsaw")).strftime('%Y-%m-%d')
+log_file_path = os.path.join(log_directory, f'app_{current_date}.log')
+formatter = CustomFormatter('%(asctime)s | %(levelname)s | %(pathname)s:%(lineno)d - %(message)s')
 
 # File handler setup
 file_handler = FileHandler(log_file_path)
@@ -31,9 +32,8 @@ stream_handler.setFormatter(formatter)
 
 # Get the logger instance
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
 logger.addHandler(file_handler)
 logger.addHandler(stream_handler)
-
 
 logger.propagate = False

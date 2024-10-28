@@ -6,6 +6,7 @@ tests = Blueprint('tests', __name__)
 
 @tests.route('/')
 def index():
+    """Test route to check Redis and retrieve a user by ID."""
     redis_client = current_app.redis_client
     user_manager = UserManager(app=current_app)
 
@@ -17,8 +18,12 @@ def index():
         message = redis_client.get("hello_keyt").decode("utf-8")
 
         logger.info("Set and retrieved message from Redis: %s", message)
+        logger.info(user.name)
 
-        return jsonify(message=message, user=user)
+        # Преобразуем объект User в словарь перед сериализацией в JSON
+        user_data = user.__dict__ if user else None
+
+        return jsonify(message=message, user=user_data)
 
     except Exception as e:
         logger.error("An error occurred while processing the request: %s", str(e))

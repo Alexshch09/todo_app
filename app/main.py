@@ -9,6 +9,7 @@ from redis import Redis
 from config import Config
 from db_manager import init_db
 from logger_setup import logger
+from error_handlers import register_error_handlers
 
 # Blueprints Import
 from routes.tests import tests
@@ -34,6 +35,9 @@ def create_app(config_class=Config):
     # Register all blueprints
     app.register_blueprint(tests) # Blueprint for beta functions
     app.register_blueprint(auth) # Authentication
+
+    # Register error handlers
+    register_error_handlers(app)
     
     logger.info("Flask app initialized with config: %s", config_class)
 

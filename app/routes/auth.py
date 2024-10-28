@@ -17,14 +17,14 @@ def index():
 
     try:
         user = user_manager.get_user_by_id(user_id)
-        logger.info("Retrieved user: %s", user)
+        logger.info("Retrieved user: %s", user=user.__dict__)
 
         redis_client.set("hello_keyt", "Hello from Redis!2121")
         message = redis_client.get("hello_keyt").decode("utf-8")
 
         logger.info("Set and retrieved message from Redis: %s", message)
 
-        return jsonify(message=message, user=user)
+        return jsonify(message=message, user=user.__dict__)
 
     except Exception as e:
         logger.error("An error occurred while processing the request: %s", str(e))
