@@ -31,14 +31,13 @@ def create_app(config_class=Config):
     app = Flask(__name__) # Create app
     app.config.from_object(config_class) # Load config
 
-    # Sentry for logging (Optional) [If you don`t need it just comment sentry_sdk.init]
-    sentry_sdk.init(
-    dsn=app.config['SENTRY_DSN'],
-    traces_sample_rate=1.0,
-    _experiments={
-        "continuous_profiling_auto_start": True,
-        },
-    )
+    # Sentry for error tracking (Optional)
+    if app.config.get("SENTRY_DSN"):
+        sentry_sdk.init(
+            dsn=app.config['SENTRY_DSN'],
+            traces_sample_rate=1.0,
+            _experiments={"continuous_profiling_auto_start": True},
+        )
     
     cloudinary.config(
         cloud_name=app.config['CLOUDINARY_CLOUD_NAME'],

@@ -35,8 +35,6 @@ def get_user_by_id(id):
     """Fetch user data"""
     user_manager = UserManager(app=current_app)
 
-    user_id = get_jwt_identity()
-
     try:
         user = user_manager.get_user_by_id(id)
         if user:
