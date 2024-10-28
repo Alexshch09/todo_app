@@ -3,6 +3,20 @@ from psycopg2.extras import RealDictCursor
 from flask import current_app
 from logger_setup import logger  # Импортируем ваш logger
 
+def with_transaction(func):
+    """Decorator to ensure automatic rollback on transaction errors."""
+    def wrapper(self, *args, **kwargs):
+        self.connect()  # Ensure connection is available
+        try:
+            result = func(self, *args, **kwargs)
+            self.conn.commit()
+            return result
+        except Exception as e:
+            self.conn.rollback()
+            logger.error("Transaction error in %s: %s. Rolled back.", func.__name__, e)
+            raise e
+    return wrapper
+
 class DBManager:
     """Database manager for handling PostgreSQL connections and queries."""
     
@@ -36,47 +50,33 @@ class DBManager:
             self.conn.close()
             logger.info("Database connection closed.")
 
+    @with_transaction
     def fetch_all(self, query, params=None):
         """Execute a SELECT query and return all results."""
-        self.connect()
-        try:
-            with self.conn.cursor() as cursor:
-                logger.debug("Executing query: %s with params: %s", query, params)
-                cursor.execute(query, params)
-                result = cursor.fetchall()
-                logger.info("Query executed successfully.")
-                return result
-        except Exception as e:
-            logger.error("Error executing fetch_all query: %s", e)
-            raise
+        with self.conn.cursor() as cursor:
+            logger.debug("Executing query: %s with params: %s", query, params)
+            cursor.execute(query, params)
+            result = cursor.fetchall()
+            logger.info("Query executed successfully.")
+            return result
 
+    @with_transaction
     def fetch_one(self, query, params=None):
         """Execute a SELECT query and return a single result."""
-        self.connect()
-        try:
-            with self.conn.cursor() as cursor:
-                logger.debug("Executing query: %s with params: %s", query, params)
-                cursor.execute(query, params)
-                result = cursor.fetchone()
-                logger.info("Query executed successfully.")
-                return result
-        except Exception as e:
-            logger.error("Error executing fetch_one query: %s", e)
-            raise
+        with self.conn.cursor() as cursor:
+            logger.debug("Executing query: %s with params: %s", query, params)
+            cursor.execute(query, params)
+            result = cursor.fetchone()
+            logger.info("Query executed successfully.")
+            return result
 
+    @with_transaction
     def insert(self, query, params=None):
         """Execute an INSERT query and commit the changes."""
-        self.connect()
-        try:
-            with self.conn.cursor() as cursor:
-                logger.debug("Executing insert query: %s with params: %s", query, params)
-                cursor.execute(query, params)
-                self.conn.commit()
-                logger.info("Insert query committed successfully.")
-        except Exception as e:
-            self.conn.rollback()
-            logger.error("Error executing insert query: %s. Rolled back.", e)
-            raise e
+        with self.conn.cursor() as cursor:
+            logger.debug("Executing insert query: %s with params: %s", query, params)
+            cursor.execute(query, params)
+            logger.info("Insert query committed successfully.")
 
 # Initialize DBManager in Flask app context
 def init_db(app):
