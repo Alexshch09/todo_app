@@ -12,6 +12,15 @@ class Project:
 
     def __repr__(self):
         return f"<Project id={self.id} name={self.name}>"
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'name': self.name,
+            'icon': self.icon,
+            'color': self.color
+        }
 
     @classmethod
     def from_dict(cls, data):
@@ -35,4 +44,46 @@ class ProjectManager:
             return Project.from_dict(project_data) if project_data else None
         except Exception as e:
             logger.error(f"Error fetching project by ID: {e}")
+            raise
+    
+    def get_projects_for_user(self, user_id):
+        query = "SELECT * FROM projects WHERE user_id = %s"
+        try:
+            projects_data = self.db_manager.fetch_all(query, (user_id,))
+            return [Project.from_dict(project) for project in projects_data]
+        except Exception as e:
+            logger.error(f"Error fetching projects for user: {e}")
+            raise
+
+    def create_project(self, user_id, name, icon=None, color=None):
+        query = """
+        INSERT INTO projects (user_id, name, icon, color)
+        VALUES (%s, %s, %s, %s) RETURNING id
+        """
+        try:
+            project_id = self.db_manager.fetch_one(query, (user_id, name, icon, color))['id']
+            logger.info(f"Project {project_id} created successfully.")
+            return project_id
+        except Exception as e:
+            logger.error(f"Error creating project: {e}")
+            raise
+
+    def update_project(self, project_id, **kwargs):
+        columns = ', '.join(f"{key} = %s" for key in kwargs)
+        values = tuple(kwargs.values()) + (project_id,)
+        query = f"UPDATE projects SET {columns} WHERE id = %s"
+        try:
+            self.db_manager.insert(query, values)
+            logger.info(f"Project {project_id} updated successfully.")
+        except Exception as e:
+            logger.error(f"Error updating project {project_id}: {e}")
+            raise
+
+    def delete_project(self, project_id):
+        query = "DELETE FROM projects WHERE id = %s"
+        try:
+            self.db_manager.insert(query, (project_id,))
+            logger.info(f"Project {project_id} deleted successfully.")
+        except Exception as e:
+            logger.error(f"Error deleting project {project_id}: {e}")
             raise

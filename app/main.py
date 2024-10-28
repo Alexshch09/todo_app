@@ -15,6 +15,7 @@ from error_handlers import register_error_handlers
 # Blueprints Import
 from routes.tests import tests
 from routes.auth import auth
+from routes.profile import profile
 
 jwt = JWTManager()
 
@@ -46,6 +47,7 @@ def create_app(config_class=Config):
     # Register all blueprints
     app.register_blueprint(tests) # Blueprint for beta functions
     app.register_blueprint(auth) # Authentication
+    app.register_blueprint(profile) # Profile
 
     # Register error handlers
     register_error_handlers(app)
