@@ -24,7 +24,7 @@ def get_user_projects(project_id):
 @tasks.route('/tasks/project/<project_id>', methods=['POST'])
 @jwt_required()
 def create_project(project_id):
-    """Create a new project for the authenticated user."""
+    """Create a new task for the authenticated user."""
     user_id = get_jwt_identity()
     data = request.get_json()
     title = data.get('title')
