@@ -22,7 +22,6 @@ CREATE TABLE tasks (
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE SET NULL,
     title VARCHAR(100) NOT NULL,
     description TEXT,
-    steps JSON,
     color VARCHAR(20),
     is_completed BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

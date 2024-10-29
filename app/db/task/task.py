@@ -4,13 +4,12 @@ from datetime import datetime
 from logger_setup import logger
 
 class Task:
-    def __init__(self, id, project_id, user_id, title, description, steps, color, is_completed, created_at, deadline):
+    def __init__(self, id, project_id, user_id, title, description, color, is_completed, created_at, deadline):
         self.id = id
         self.project_id = project_id
         self.user_id = user_id
         self.title = title
         self.description = description
-        self.steps = steps
         self.color = color
         self.is_completed = is_completed
         self.created_at = created_at
@@ -27,7 +26,6 @@ class Task:
             "user_id": self.user_id,
             "title": self.title,
             "description": self.description,
-            "steps": self.steps,
             "color": self.color,
             "is_completed": self.is_completed,
             "created_at": self.created_at,
@@ -42,7 +40,6 @@ class Task:
             user_id=data['user_id'],
             title=data['title'],
             description=data.get('description'),
-            steps=data.get('steps'),
             color=data.get('color'),
             is_completed=data.get('is_completed', False),
             created_at=data.get('created_at'),
@@ -88,10 +85,10 @@ class TaskManager:
         timestamp = now.strftime("%a, %d %b %Y %H:%M:%S GMT")
 
         query = """
-        INSERT INTO tasks (project_id, user_id, title, description, steps, color, is_completed, created_at, deadline)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id
+        INSERT INTO tasks (project_id, user_id, title, description, color, is_completed, created_at, deadline)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s) RETURNING id
         """
-        values = (project_id, user_id, title, description, steps, color, is_completed, timestamp, deadline)
+        values = (project_id, user_id, title, description, color, is_completed, timestamp, deadline)
 
 
         try:
@@ -104,7 +101,6 @@ class TaskManager:
                 user_id=user_id,
                 title=title,
                 description=description,
-                steps=steps,
                 color=color,
                 is_completed=is_completed,
                 created_at=now,
