@@ -1,4 +1,5 @@
 from flask import current_app
+from datetime import datetime
 
 from logger_setup import logger
 
@@ -80,13 +81,18 @@ class TaskManager:
             logger.error(f"Error fetching tasks for user: {e}")
             raise
 
-    def create_task(self, project_id, user_id, title, description=None, steps="[]", color="#ff0000", is_completed=False, created_at=None, deadline=None):
+    def create_task(self, project_id, user_id, title, description="", steps="[]", color="#ff0000", is_completed=False, created_at=None, deadline=None):
         """Create a new task and insert it into the database."""
+
+        now = datetime.now()
+        timestamp = now.strftime("%a, %d %b %Y %H:%M:%S GMT")
+
         query = """
         INSERT INTO tasks (project_id, user_id, title, description, steps, color, is_completed, created_at, deadline)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id
         """
-        values = (project_id, user_id, title, description, steps, color, is_completed, created_at, deadline)
+        values = (project_id, user_id, title, description, steps, color, is_completed, timestamp, deadline)
+
 
         try:
             # Insert task and fetch the generated ID
@@ -101,7 +107,7 @@ class TaskManager:
                 steps=steps,
                 color=color,
                 is_completed=is_completed,
-                created_at=created_at,
+                created_at=now,
                 deadline=deadline
             )
         except Exception as e:
