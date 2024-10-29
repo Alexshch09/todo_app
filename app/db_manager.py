@@ -78,6 +78,17 @@ class DBManager:
             cursor.execute(query, params)
             logger.info("Insert query committed successfully.")
 
+    @with_transaction
+    def insert_returning_id(self, query, params=None):
+        """Execute an INSERT query and return the generated ID."""
+        with self.conn.cursor() as cursor:
+            logger.debug("Executing insert query: %s with params: %s", query, params)
+            cursor.execute(query, params)
+            generated_id = cursor.fetchone()['id']  # Предполагаем, что возвращается id
+            logger.info("Insert query committed successfully. Generated ID: %s", generated_id)
+            return generated_id
+
+
 # Initialize DBManager in Flask app context
 def init_db(app):
     """Initialize DBManager instance for Flask app."""

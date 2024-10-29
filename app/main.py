@@ -18,6 +18,7 @@ from routes.tests import tests
 from routes.auth import auth
 from routes.profile import profile
 from routes.projects import projects
+from routes.tasks import tasks
 
 jwt = JWTManager()
 
@@ -29,6 +30,7 @@ def register_blueprints(app):
     app.register_blueprint(auth)       # Authentication
     app.register_blueprint(profile) # Profile
     app.register_blueprint(projects) # Projects
+    app.register_blueprint(tasks) # Tasks
 
 
 

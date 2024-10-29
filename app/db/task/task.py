@@ -80,6 +80,34 @@ class TaskManager:
             logger.error(f"Error fetching tasks for user: {e}")
             raise
 
+    def create_task(self, project_id, user_id, title, description=None, steps="[]", color="#ff0000", is_completed=False, created_at=None, deadline=None):
+        """Create a new task and insert it into the database."""
+        query = """
+        INSERT INTO tasks (project_id, user_id, title, description, steps, color, is_completed, created_at, deadline)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id
+        """
+        values = (project_id, user_id, title, description, steps, color, is_completed, created_at, deadline)
+
+        try:
+            # Insert task and fetch the generated ID
+            task_id = self.db_manager.insert_returning_id(query, values)
+            logger.info(f"Task {task_id} created successfully.")
+            return Task(
+                id=task_id,
+                project_id=project_id,
+                user_id=user_id,
+                title=title,
+                description=description,
+                steps=steps,
+                color=color,
+                is_completed=is_completed,
+                created_at=created_at,
+                deadline=deadline
+            )
+        except Exception as e:
+            logger.error(f"Error creating task: {e}")
+            raise
+
     def update_task(self, task_id, **kwargs):
         columns = ', '.join(f"{key} = %s" for key in kwargs)
         values = tuple(kwargs.values()) + (task_id,)

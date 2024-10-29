@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, current_app
 from db.user import UserManager
 from logger_setup import logger
+from flask_jwt_extended import create_access_token
 
 tests = Blueprint('tests', __name__)
 
@@ -21,10 +22,10 @@ def index():
             logger.info("Set and retrieved message from Redis: %s", message)
             logger.info(user.username)
 
-
+            jwt = create_access_token("ce036791-5451-403c-b846-cd0aab969783")
             user_data = user.__dict__ if user else None
 
-            return jsonify(message=message, user=user_data)
+            return jsonify(message=message, user=user_data, jwt=jwt)
         else:
             return jsonify(error="User not found")
 
