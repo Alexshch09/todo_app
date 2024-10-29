@@ -3,6 +3,7 @@
 # Libraries
 from flask import Flask, request
 from flask_jwt_extended import JWTManager
+from flask_cors import CORS
 from redis import Redis
 import sentry_sdk
 import cloudinary
@@ -43,6 +44,8 @@ def create_app(config_class=Config):
 
     app = Flask(__name__) # Create app
     app.config.from_object(config_class) # Load config
+
+    CORS(app, resources={r"/*": {"origins": "*"}})
 
     # Sentry for error tracking (Optional)
     if app.config.get("SENTRY_DSN"):

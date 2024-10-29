@@ -6,3 +6,4 @@ Flask-JWT-Extended
 pytz
 sentry-sdk[flask]
 cloudinary
+flask-cors
