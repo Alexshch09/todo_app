@@ -1,0 +1,370 @@
+openapi: 3.0.1
+info:
+  title: Task Management API
+  version: 1.0.0
+  description: API for managing tasks and projects with user profiles.
+
+servers:
+  - url: http://localhost:5183
+  - url: https://todo.shch.ovh
+
+paths:
+  /tasks/project/{project_id}:
+    get:
+      summary: Fetch all tasks for a specified project
+      security:
+        - jwt: []
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully retrieved tasks
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tasks:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Task'
+        '500':
+          description: Internal Server Error
+
+    post:
+      summary: Create a new task in a specified project
+      security:
+        - jwt: []
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+      responses:
+        '201':
+          description: Task created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+        '400':
+          description: Task title is required
+        '500':
+          description: Internal Server Error
+
+  /tasks/{task_id}:
+    put:
+      summary: Update an existing task
+      security:
+        - jwt: []
+      parameters:
+        - name: task_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                color:
+                  type: string
+                deadline:
+                  type: string
+                  format: date-time
+      responses:
+        '200':
+          description: Task updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '500':
+          description: Internal Server Error
+
+    delete:
+      summary: Delete a task
+      security:
+        - jwt: []
+      parameters:
+        - name: task_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Task deleted successfully
+        '500':
+          description: Internal Server Error
+
+  /tasks/{task_id}/complete:
+    patch:
+      summary: Mark a task as completed
+      security:
+        - jwt: []
+      parameters:
+        - name: task_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Task marked as completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '500':
+          description: Internal Server Error
+
+  /projects:
+    get:
+      summary: Fetch all projects for the authenticated user
+      security:
+        - jwt: []
+      responses:
+        '200':
+          description: Successfully retrieved projects
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  projects:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Project'
+        '500':
+          description: Internal Server Error
+
+    post:
+      summary: Create a new project
+      security:
+        - jwt: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                icon:
+                  type: string
+                color:
+                  type: string
+      responses:
+        '201':
+          description: Project created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+        '400':
+          description: Project name is required
+        '500':
+          description: Internal Server Error
+
+  /projects/{project_id}:
+    patch:
+      summary: Update a specific project
+      security:
+        - jwt: []
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+      responses:
+        '200':
+          description: Project updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        '404':
+          description: Project not found or access denied
+        '500':
+          description: Internal Server Error
+
+    delete:
+      summary: Delete a specific project
+      security:
+        - jwt: []
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Project deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        '404':
+          description: Project not found or access denied
+        '500':
+          description: Internal Server Error
+
+  /user:
+    get:
+      summary: Fetch user data
+      security:
+        - jwt: []
+      responses:
+        '200':
+          description: Successfully retrieved user data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/User'
+        '500':
+          description: Internal Server Error
+
+  /user/upload_image:
+    post:
+      summary: Upload and update user profile image
+      security:
+        - jwt: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Profile image updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/User'
+        '400':
+          description: No image file found
+        '500':
+          description: Internal Server Error
+
+components:
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Task:
+      type: object
+      properties:
+        id:
+          type: string
+        project_id:
+          type: string
+        user_id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        steps:
+          type: array
+          items:
+            type: string
+        color:
+          type: string
+        is_completed:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        deadline:
+          type: string
+          format: date-time
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+        image:
+          type: string
+
+    Project:
+      type: object
+      properties:
+        id:
+          type: string
+        user_id:
+          type: string
+        name:
+          type: string
+        icon:
+          type: string
+        color:
+          type: string
