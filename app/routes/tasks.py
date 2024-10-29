@@ -41,45 +41,58 @@ def create_project(project_id):
         logger.error("An error occurred while creating the project: %s", str(e))
         return jsonify(error="Internal Server Error"), 500
 
-# @tasks.route('/tasks/<task_id>', methods=['PATCH'])
-# @jwt_required()
-# def update_project(task_id):
-#     """Update the name of a specific project for the authenticated user."""
-#     user_id = get_jwt_identity()
-#     data = request.get_json()
-#     new_name = data.get('name')
-#     project_manager = ProjectManager(app=current_app)
-    
-#     if not new_name:
-#         return jsonify(error="New project name is required"), 400
+@tasks.route('/tasks/<task_id>', methods=['PUT'])
+@jwt_required()
+def update_task(task_id):
+    """Update an existing task for the authenticated user."""
+    user_id = get_jwt_identity()
+    data = request.get_json()
 
-#     try:
-#         project = project_manager.get_project_by_id(project_id)
-#         if project and project.user_id == user_id:
-#             project_manager.update_project(project_id, name=new_name)
-#             logger.info("Project %s updated with new name for user: %s", project_id, user_id)
-#             return jsonify(success=True), 200
-#         else:
-#             return jsonify(error="Project not found or access denied"), 404
-#     except Exception as e:
-#         logger.error("An error occurred while updating the project: %s", str(e))
-#         return jsonify(error="Internal Server Error"), 500
-    
-# @tasks.route('/tasks/<task_id>', methods=['DELETE'])
-# @jwt_required()
-# def delete_project(task_id):
-#     """Delete a specific project for the authenticated user."""
-#     user_id = get_jwt_identity()
-#     project_manager = ProjectManager(app=current_app)
-    
-#     try:
-#         project = project_manager.get_project_by_id(project_id)
-#         if project and project.user_id == user_id:
-#             project_manager.delete_project(project_id)
-#             logger.info("Project %s deleted for user: %s", project_id, user_id)
-#             return jsonify(success=True), 200
-#         else:
-#             return jsonify(error="Project not found or access denied"), 404
-#     except Exception as e:
-#         logger.error("An error occurred while deleting the project: %s", str(e))
-#         return jsonify(error="Internal Server Error"), 500
+    # Extract fields from the request
+    title = data.get('title')
+    description = data.get('description')
+    color = data.get('color')
+    deadline = data.get('deadline')
+
+    task_manager = TaskManager(app=current_app)
+
+    try:
+        # Update the task
+        task_manager.update_task(task_id, title=title, description=description, color=color, deadline=deadline)
+        logger.info("Task %s updated for user: %s", task_id, user_id)
+        return jsonify(message="Task updated successfully"), 200
+    except Exception as e:
+        logger.error("An error occurred while updating task %s: %s", task_id, str(e))
+        return jsonify(error="Internal Server Error"), 500
+
+
+@tasks.route('/tasks/<task_id>/complete', methods=['PATCH'])
+@jwt_required()
+def complete_task(task_id):
+    """Mark a task as completed for the authenticated user."""
+    user_id = get_jwt_identity()
+    task_manager = TaskManager(app=current_app)
+
+    try:
+        task_manager.complete_task(task_id)
+        logger.info("Task %s marked as completed for user: %s", task_id, user_id)
+        return jsonify(message="Task marked as completed"), 200
+    except Exception as e:
+        logger.error("An error occurred while completing task %s: %s", task_id, str(e))
+        return jsonify(error="Internal Server Error"), 500
+
+
+@tasks.route('/tasks/<task_id>', methods=['DELETE'])
+@jwt_required()
+def delete_task(task_id):
+    """Delete a task for the authenticated user."""
+    user_id = get_jwt_identity()
+    task_manager = TaskManager(app=current_app)
+
+    try:
+        task_manager.delete_task(task_id)
+        logger.info("Task %s deleted for user: %s", task_id, user_id)
+        return jsonify(message="Task deleted successfully"), 204
+    except Exception as e:
+        logger.error("An error occurred while deleting task %s: %s", task_id, str(e))
+        return jsonify(error="Internal Server Error"), 500
