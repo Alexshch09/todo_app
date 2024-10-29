@@ -45,6 +45,16 @@ class UserManager:
             logger.error(f"Error fetching user by ID: {e}")
             raise
 
+    def get_user_by_email(self, email):
+        """Fetch a user by email."""
+        query = "SELECT * FROM users WHERE email = %s"
+        try:
+            user_data = self.db_manager.fetch_one(query, (email,))
+            return User.from_dict(user_data) if user_data else None
+        except Exception as e:
+            logger.error(f"Error fetching user by email: {e}")
+            raise
+
     def get_all_users(self):
         query = "SELECT * FROM users"
         try:
